@@ -55,19 +55,35 @@ public class Path {
 	 */
 	public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes) throws IllegalArgumentException {
 		List<Arc> arcs = new ArrayList<Arc>();
-		for (Node node : nodes) {
-			float length = 100;
-			List<Arc> successors = node.getSuccessors();
-			for (Arc arc : successors) {
-				if ( arc.getDestination().equals(nodes) && (arc.getLength() < length) ) {
-					//trouver un moyen de se souvenir du node précédent
+		if (nodes.size() == 1)
+			return new Path(graph, nodes.get(0));
+		else {
+			boolean firstnode = true;
+			List<Arc> prevsuccessors = null;
+			for (Node node : nodes) {
+				if (node.equals(nodes.get(0)) && firstnode) {
+					firstnode = false;
+					prevsuccessors = node.getSuccessors();
+				} else {
+					Arc shortestarc = null;
+					boolean valid = false;
+					float length = 1000;
+					for (Arc arc : prevsuccessors) {
+						if ( arc.getDestination().equals(node) && (arc.getLength() < length) ) {
+							valid = true;
+							shortestarc = arc;
+							length = shortestarc.getLength();
+						}
+						if (!valid)
+							throw new IllegalArgumentException("The list of nodes is not valid.");
+					}
+					arcs.add(shortestarc);
+					prevsuccessors = node.getSuccessors();
 				}
-					
 			}
 		}
 		return new Path(graph, arcs);
 	}
-
 	/**
 	 * Concatenate the given paths.
 	 * 
