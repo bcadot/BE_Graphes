@@ -46,22 +46,25 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	Node x = heap.deleteMin().getNode();
         	labels[x.getId()].setTag(true);
         	for (Arc y : x.getSuccessors()) {
-        		if (!labels[y.getDestination().getId()].getTag()) {
-        			double oldcost = labels[y.getDestination().getId()].getCost();
-        			double newcost = labels[x.getId()].getCost() + y.getLength();
-        			if (oldcost > newcost) {
-        				labels[y.getDestination().getId()].setCost(newcost);
-        				try {
-        					heap.remove(labels[y.getDestination().getId()]);
-        					heap.insert(labels[y.getDestination().getId()]);
-        				}
-        				catch(Exception e) {
-        					heap.insert(labels[y.getDestination().getId()]);
-        				}
-        				finally {
-        					labels[y.getDestination().getId()].setFather(y);
-        				}
-        			}
+        		if (data.isAllowed(y)) {
+	        		if (!labels[y.getDestination().getId()].getTag()) {
+	        			double oldcost = labels[y.getDestination().getId()].getCost();
+	        			double newcost = labels[x.getId()].getCost() + y.getLength();
+	        			if (oldcost >= newcost) {
+	        				labels[y.getDestination().getId()].setCost(newcost);
+	        				try {
+	        					heap.remove(labels[y.getDestination().getId()]);
+	        					heap.insert(labels[y.getDestination().getId()]);
+	        				}
+	        				catch(Exception e) {
+	        					heap.insert(labels[y.getDestination().getId()]);
+	        				}
+	        				finally {
+	        					labels[y.getDestination().getId()].setFather(y);
+	        					notifyNodeReached(y.getDestination());
+	        				}
+	        			}
+	        		}
         		}
         	}
         }
