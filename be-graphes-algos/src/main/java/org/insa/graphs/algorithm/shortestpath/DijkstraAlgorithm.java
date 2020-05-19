@@ -20,12 +20,15 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     @Override
     protected ShortestPathSolution doRun() {
 
-        // Retrieve the graph.
-        ShortestPathData data = getInputData();
-        Graph graph = data.getGraph();
+    // Retrieve the graph.
+    ShortestPathData data = getInputData();
+    Graph graph = data.getGraph();
+    
+    if (graph.getNodes().size() == 0)
+    	return new ShortestPathSolution(data, Status.INFEASIBLE);
 
-        final int nbNodes = graph.size();
-        
+    final int nbNodes = graph.size();
+    
         //Array of "Label" 
         Label[] labels = new Label[nbNodes];
         for (Node node : graph.getNodes()) {
@@ -45,21 +48,32 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         while (!heap.isEmpty()) {
         	Node x = heap.deleteMin().getNode();
         	labels[x.getId()].setTag(true);
+        	//System.out.println("Le node " + x.getId() + " a été sélectionné");System.out.println("Taille du tas = " + heap.size());
+        	/*
+        	if (heap.isValid()) {
+        		System.out.println("Le tas est valide.");
+        	} else {
+        		System.out.println("Le tas est invalide.");
+        	}
+        	*/
         	for (Arc y : x.getSuccessors()) {
+        		//System.out.println("Le node " + y.getDestination().getId() + " est un successeur de " + x.getId() + 
+        		//		", TAG : " + labels[y.getDestination().getId()].getTag());
         		if (data.isAllowed(y)) {
 	        		if (!labels[y.getDestination().getId()].getTag()) {
 	        			double oldcost = labels[y.getDestination().getId()].getCost();
 	        			double newcost = labels[x.getId()].getCost() + y.getLength();
 	        			if (oldcost >= newcost) {
-	        				labels[y.getDestination().getId()].setCost(newcost);
 	        				try {
 	        					heap.remove(labels[y.getDestination().getId()]);
-	        					heap.insert(labels[y.getDestination().getId()]);
+	        					//System.out.println("(1) Le node " + y.getDestination().getId() + " a été inséré");
 	        				}
 	        				catch(Exception e) {
-	        					heap.insert(labels[y.getDestination().getId()]);
+	        					//System.out.println("(2) Le node " + y.getDestination().getId() + " a été inséré");
 	        				}
 	        				finally {
+		        				labels[y.getDestination().getId()].setCost(newcost);
+	        					heap.insert(labels[y.getDestination().getId()]);
 	        					labels[y.getDestination().getId()].setFather(y);
 	        					notifyNodeReached(y.getDestination());
 	        				}
@@ -70,6 +84,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         }
         
         ShortestPathSolution solution = null;
+        
         if (labels[data.getDestination().getId()].getFather() == null) {
             solution = new ShortestPathSolution(data, Status.INFEASIBLE);
         }
@@ -82,6 +97,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	Arc arc = labels[data.getDestination().getId()].getFather();
         	while (arc != null) {
         		arcs.add(arc);
+        		//System.out.println("Coût :" + labels[arc.getDestination().getId()].getCost());
         		arc = labels[arc.getOrigin().getId()].getFather();
         	}
                 
