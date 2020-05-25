@@ -8,8 +8,8 @@ import java.util.Arrays;
 
 import org.insa.graphs.model.Arc;
 import org.insa.graphs.model.Graph;
+import org.insa.graphs.model.GraphStatistics;
 import org.insa.graphs.model.Node;
-import org.insa.graphs.model.Path;
 import org.insa.graphs.model.RoadInformation;
 import org.insa.graphs.model.RoadInformation.RoadType;
 import org.junit.BeforeClass;
@@ -58,7 +58,7 @@ public class DijkstraTest {
         d2e = Node.linkNodes(nodes[3], nodes[4], 22.8f, speed20, null);
         e2d = Node.linkNodes(nodes[4], nodes[0], 10, speed10, null);
 
-        graph = new Graph("ID", "", Arrays.asList(nodes), null);
+        graph = new Graph("ID", "", Arrays.asList(nodes), new GraphStatistics(null, 0, 0, -1, 0));
 
     }
     //ArcInspectors
@@ -101,7 +101,7 @@ public class DijkstraTest {
 				//System.out.println(solutionD.toString());
 				ShortestPathSolution solutionB = new BellmanFordAlgorithm(new ShortestPathData(graph, nodes[i], nodes[j], arc0)).run();
 				//System.out.println(solutionB.toString());
-				assertEquals(solutionD.toString(), solutionB.toString());
+				assertEquals(solutionB.toString(), solutionD.toString());
 			}
 		}
 	}

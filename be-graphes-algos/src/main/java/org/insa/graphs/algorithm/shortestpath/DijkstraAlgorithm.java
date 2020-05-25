@@ -7,7 +7,8 @@ import org.insa.graphs.model.Arc;
 import org.insa.graphs.model.Graph;
 import org.insa.graphs.model.Node;
 import org.insa.graphs.model.Path;
-import org.insa.graphs.model.Label;
+import org.insa.graphs.algorithm.Label;
+import org.insa.graphs.algorithm.AbstractInputData.Mode;
 import org.insa.graphs.algorithm.AbstractSolution.Status;
 import org.insa.graphs.algorithm.utils.BinaryHeap;
 
@@ -16,27 +17,30 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
     }
+    
+    protected Label initLabel (Node node) {
+		double inf = Double.POSITIVE_INFINITY;
+		return new Label(node, false, inf, null);
+	}
 
     @Override
     protected ShortestPathSolution doRun() {
 
-    // Retrieve the graph.
-    ShortestPathData data = getInputData();
-    Graph graph = data.getGraph();
+	    // Retrieve the graph.
+	    ShortestPathData data = getInputData();
+	    Graph graph = data.getGraph();
+	    
+	    if (graph.getNodes().size() == 0)
+	    	return new ShortestPathSolution(data, Status.INFEASIBLE);
+	
+	    final int nbNodes = graph.size();
     
-    if (graph.getNodes().size() == 0)
-    	return new ShortestPathSolution(data, Status.INFEASIBLE);
-
-    final int nbNodes = graph.size();
-    
-        //Array of "Label" 
+	    //Array of "Label" 
         Label[] labels = new Label[nbNodes];
         for (Node node : graph.getNodes()) {
-        	if (node.equals(data.getOrigin()))
-        		labels[node.getId()] = new Label(node, false, 0, null);
-        	else
-        		labels[node.getId()] = new Label(node, false, Double.POSITIVE_INFINITY, null);
+        	labels[node.getId()] = initLabel(node);
         }
+        labels[data.getOrigin().getId()].setCost(0);
         
         //Heap
         BinaryHeap<Label> heap = new BinaryHeap<Label>();
@@ -47,29 +51,24 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         
         while (!heap.isEmpty()) {
         	Node x = heap.deleteMin().getNode();
+        	if (x.compareTo(data.getDestination()) == 0)
+        		break;
         	labels[x.getId()].setTag(true);
-        	//System.out.println("Le node " + x.getId() + " a été sélectionné");System.out.println("Taille du tas = " + heap.size());
-        	/*
-        	if (heap.isValid()) {
-        		System.out.println("Le tas est valide.");
-        	} else {
-        		System.out.println("Le tas est invalide.");
-        	}
-        	*/
+        	notifyNodeMarked(x);
         	for (Arc y : x.getSuccessors()) {
-        		//System.out.println("Le node " + y.getDestination().getId() + " est un successeur de " + x.getId() + 
-        		//		", TAG : " + labels[y.getDestination().getId()].getTag());
         		if (data.isAllowed(y)) {
 	        		if (!labels[y.getDestination().getId()].getTag()) {
 	        			double oldcost = labels[y.getDestination().getId()].getCost();
-	        			double newcost = labels[x.getId()].getCost() + y.getLength();
+	        			double newcost = 0;
+	        			if (data.getMode() == Mode.LENGTH)
+	        				newcost = labels[x.getId()].getCost() + y.getLength();
+	        			else if (data.getMode() == Mode.TIME)
+	        				newcost = labels[x.getId()].getCost() + y.getMinimumTravelTime();
 	        			if (oldcost >= newcost) {
 	        				try {
 	        					heap.remove(labels[y.getDestination().getId()]);
-	        					//System.out.println("(1) Le node " + y.getDestination().getId() + " a été inséré");
 	        				}
 	        				catch(Exception e) {
-	        					//System.out.println("(2) Le node " + y.getDestination().getId() + " a été inséré");
 	        				}
 	        				finally {
 		        				labels[y.getDestination().getId()].setCost(newcost);
@@ -97,7 +96,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	Arc arc = labels[data.getDestination().getId()].getFather();
         	while (arc != null) {
         		arcs.add(arc);
-        		//System.out.println("Coût :" + labels[arc.getDestination().getId()].getCost());
         		arc = labels[arc.getOrigin().getId()].getFather();
         	}
                 

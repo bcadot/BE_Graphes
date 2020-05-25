@@ -45,7 +45,7 @@ public class Path {
 				} else {
 					Arc shortestarc = null;
 					boolean valid = false;
-					float time = 1000;
+					float time = Float.POSITIVE_INFINITY;
 					for (Arc arc : prevsuccessors) {
 						if ( arc.getDestination().equals(node) && (arc.getMinimumTravelTime() < time) ) {
 							valid = true;
@@ -90,7 +90,7 @@ public class Path {
 				} else {
 					Arc shortestarc = null;
 					boolean valid = false;
-					float length = 1000;
+					float length = Float.POSITIVE_INFINITY;
 					for (Arc arc : prevsuccessors) {
 						if ( arc.getDestination().equals(node) && (arc.getLength() < length) ) {
 							valid = true;
