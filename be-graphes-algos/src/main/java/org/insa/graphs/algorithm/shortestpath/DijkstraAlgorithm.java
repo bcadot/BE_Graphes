@@ -7,10 +7,10 @@ import org.insa.graphs.model.Arc;
 import org.insa.graphs.model.Graph;
 import org.insa.graphs.model.Node;
 import org.insa.graphs.model.Path;
-import org.insa.graphs.algorithm.Label;
 import org.insa.graphs.algorithm.AbstractInputData.Mode;
 import org.insa.graphs.algorithm.AbstractSolution.Status;
 import org.insa.graphs.algorithm.utils.BinaryHeap;
+import org.insa.graphs.algorithm.utils.Label;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
@@ -29,11 +29,14 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	    // Retrieve the graph.
 	    ShortestPathData data = getInputData();
 	    Graph graph = data.getGraph();
-	    
-	    if (graph.getNodes().size() == 0)
-	    	return new ShortestPathSolution(data, Status.INFEASIBLE);
 	
 	    final int nbNodes = graph.size();
+
+	    if (nbNodes == 0)
+	    	return new ShortestPathSolution(data, Status.INFEASIBLE);
+	    
+	    if (data.getOrigin().compareTo(data.getDestination()) == 0)
+	    	return new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, data.getDestination()));
     
 	    //Array of "Label" 
         Label[] labels = new Label[nbNodes];

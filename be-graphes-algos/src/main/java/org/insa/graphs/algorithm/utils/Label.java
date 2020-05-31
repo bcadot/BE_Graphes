@@ -1,17 +1,19 @@
-package org.insa.graphs.algorithm;
+package org.insa.graphs.algorithm.utils;
 
 import org.insa.graphs.model.Arc;
 import org.insa.graphs.model.Node;
 
 public class Label implements Comparable<Label>{
+	
 	//attributes
 	protected Node currentNode;
-	//a tagged Node means it has been visited
 	protected boolean tag;
 	protected double cost;
 	protected Arc father;
 	
-	//constructor
+	/**
+     * Construct a new label.
+     */
 	public Label(Node node, boolean Tag, double Cost, Arc Father) {
 		this.currentNode = node;
 		tag = Tag;

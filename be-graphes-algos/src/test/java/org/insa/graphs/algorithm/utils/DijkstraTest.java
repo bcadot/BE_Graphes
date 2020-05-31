@@ -67,11 +67,15 @@ public class DijkstraTest {
 	
 	@Test
 	public void testValidPath() {
-		ShortestPathSolution solution = new DijkstraAlgorithm(new ShortestPathData(graph, nodes[0], nodes[4], arc0)).run();
-		if (solution.isFeasible())
-			assertTrue(solution.getPath().isValid());
-		else
-			fail("Solution non faisable");
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
+				ShortestPathSolution solution = new DijkstraAlgorithm(new ShortestPathData(graph, nodes[i], nodes[j], arc0)).run();
+				if (solution.isFeasible())
+					assertTrue(solution.getPath().isValid());
+				else
+					fail("Solution non faisable");
+			}
+		}
 	}
 	
 	@Test
@@ -93,14 +97,27 @@ public class DijkstraTest {
 	}
 	
 	@Test
-	public void testShortestPath() {
+	public void testShortestPath_arc0() {
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 5; j++) {
-				//System.out.println("Origine : " + nodes[i].getId() + " ; Destination : " + nodes[j].getId());
+				if (i == j)
+					break;
 				ShortestPathSolution solutionD = new DijkstraAlgorithm(new ShortestPathData(graph, nodes[i], nodes[j], arc0)).run();
-				//System.out.println(solutionD.toString());
 				ShortestPathSolution solutionB = new BellmanFordAlgorithm(new ShortestPathData(graph, nodes[i], nodes[j], arc0)).run();
-				//System.out.println(solutionB.toString());
+				assertEquals(solutionB.toString(), solutionD.toString());
+			}
+		}
+	}
+	
+	@Test
+	public void testShortestPath_arc2() {
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
+				if (i == j)
+					//Selon Bellman-Ford, si départ = arrivée alors il n'y a pas de solution (c'est faux)
+					break;
+				ShortestPathSolution solutionD = new DijkstraAlgorithm(new ShortestPathData(graph, nodes[i], nodes[j], arc2)).run();
+				ShortestPathSolution solutionB = new BellmanFordAlgorithm(new ShortestPathData(graph, nodes[i], nodes[j], arc2)).run();
 				assertEquals(solutionB.toString(), solutionD.toString());
 			}
 		}

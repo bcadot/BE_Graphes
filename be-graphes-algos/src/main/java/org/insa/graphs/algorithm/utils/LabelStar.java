@@ -1,4 +1,4 @@
-package org.insa.graphs.algorithm;
+package org.insa.graphs.algorithm.utils;
 
 import org.insa.graphs.algorithm.AbstractInputData.Mode;
 import org.insa.graphs.model.Arc;
@@ -12,7 +12,10 @@ public class LabelStar extends Label implements Comparable<Label>{
 	private Node destination;
 	private Mode mode;
 	private int maxSpeed;
-
+	
+	/**
+     * Construct a new label for the A* algorithm.
+     */
 	public LabelStar(Node node, boolean Tag, double Cost, Arc Father, Node destination, Mode mode, int maxSpeed) {
 		super(node, Tag, Cost, Father);
 		this.destination = destination;
